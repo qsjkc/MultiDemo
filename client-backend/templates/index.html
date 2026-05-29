@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>火山引擎 RTC 语音对话 Demo</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/@volcengine/vertc-web-sdk@latest/lib/vertc.full.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>火山引擎 RTC 语音对话 Demo</h1>
+            <div class="status-bar">
+                <span id="status-indicator" class="indicator disconnected"></span>
+                <span id="status-text">未连接</span>
+            </div>
+            <div class="controls">
+                <button id="btn-connect" onclick="connectRTC()">连接服务</button>
+                <button id="btn-disconnect" onclick="disconnectRTC()" disabled>断开连接</button>
+                <button id="btn-start-agent" onclick="startAgent()" disabled>启动智能体</button>
+                <button id="btn-stop-agent" onclick="stopAgent()" disabled>停止智能体</button>
+            </div>
+        </header>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="ptt">🎤 按键对话</button>
+            <button class="tab-btn" data-tab="vad">🔊 VAD自由对话</button>
+            <button class="tab-btn" data-tab="image">🖼️ 上传图片</button>
+        </div>
+
+        <div class="tab-content active" id="tab-ptt">
+            <div class="ptt-area">
+                <button id="btn-push-talk" class="ptt-btn"
+                        onmousedown="startRecording()" onmouseup="stopRecording()"
+                        onmouseleave="stopRecording()"
+                        ontouchstart="startRecording()" ontouchend="stopRecording()">
+                    🎤 按住说话
+                </button>
+                <p class="ptt-hint">长按按钮开始录音，松开后自动发送</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-vad">
+            <div class="vad-area">
+                <p class="vad-status" id="vad-status">等待对话开始...</p>
+                <div class="vad-wave" id="vad-wave">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="vad-buttons">
+                    <button id="btn-interrupt" onclick="interruptAgent()" disabled>打断回复</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-image">
+            <div class="image-area">
+                <label class="image-upload-btn" for="image-input">📁 选择图片</label>
+                <input type="file" id="image-input" accept="image/*" style="display:none"
+                       onchange="onImageSelected(event)">
+                <span id="image-name" class="image-name">未选择图片</span>
+                <div id="image-preview" class="image-preview"></div>
+                <textarea id="image-prompt" class="image-prompt"
+                          placeholder="输入提示文字（可选），如：描述这张图片"></textarea>
+                <button class="image-send-btn" onclick="sendImage()">发送图片给智能体</button>
+            </div>
+        </div>
+
+        <div class="conversation-area">
+            <div class="conversation-log" id="conversation-log">
+                <div class="msg system">=== 火山引擎 RTC 语音对话 Demo ===</div>
+                <div class="msg system">请先点击「连接服务」进入 RTC 房间</div>
+            </div>
+        </div>
+
+        <div class="text-input-area">
+            <input type="text" id="text-input" class="text-input"
+                   placeholder="在这里输入文字，按回车发送..." onkeydown="onTextInput(event)">
+            <button class="send-btn" onclick="sendText()">发送</button>
+        </div>
+    </div>
+
+    <script src="/static/rtc-client.js"></script>
+    <script src="/static/ui-controller.js"></script>
+    <script>
+        const ROOM_ID = "{{ room_id }}";
+        const USER_ID = "{{ user_id }}";
+        document.getElementById("status-text").textContent += " | 房间: " + ROOM_ID;
+    </script>
+</body>
+</html>
